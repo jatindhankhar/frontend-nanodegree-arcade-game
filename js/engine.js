@@ -13,19 +13,18 @@
  * writing app.js a little simpler to work with.
  */
 
-var Engine = (function(global) {
+var Engine = (function (global) {
     /* Predefine the variables we'll be using within this scope,
      * create the canvas element, grab the 2D context for that canvas
      * set the canvas elements height/width and add it to the DOM.
      */
     var doc = global.document,
         win = global.window,
-        canvas = doc.createElement('canvas'),
+        canvas = doc.getElementById('cnvs'),
         ctx = canvas.getContext('2d'),
-        lastTime,animationId;
-
-    canvas.width = 505;
-    canvas.height = 606;
+        lastTime;
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
     doc.body.appendChild(canvas);
 
     /* This function serves as the kickoff point for the game loop itself
@@ -39,7 +38,7 @@ var Engine = (function(global) {
          * computer is) - hurray time!
          */
         var now = Date.now(),
-            dt = (now - lastTime) / 1000.0;
+            dt = (now - lastTime) / updateInterval;
 
         /* Call our update/render functions, pass along the time delta to
          * our update function since it may be used for smooth animation.
@@ -55,7 +54,7 @@ var Engine = (function(global) {
         /* Use the browser's requestAnimationFrame function to call this
          * function again as soon as the browser is able to draw another frame.
          */
-       animationId = win.requestAnimationFrame(main);
+        animationId = win.requestAnimationFrame(main);
     }
 
     /* This function does some initial setup that should only occur once,
@@ -90,7 +89,7 @@ var Engine = (function(global) {
      * render methods.
      */
     function updateEntities(dt) {
-        allEnemies.forEach(function(enemy) {
+        allEnemies.forEach(function (enemy) {
             enemy.update(dt);
         });
         player.update();
@@ -98,24 +97,21 @@ var Engine = (function(global) {
 
     /* Check for collision between enemy and a player 
     and signal if a player dies */
-    function checkCollisions()
-    {
+    function checkCollisions() {
         let playerPosition = player.getCurrentTile();
-        if(playerPosition == -1)
-             {
-              taskCompleted();
-            }
+        if (playerPosition == -1) {
+            taskCompleted();
+        }
         // If any bug shares same tile as player, player dies
         else {
-        for(enemy of allEnemies)
-            {
-               let enemyPosition = enemy.getCurrentTile();
-               if(enemyPosition.first ==  playerPosition || enemyPosition.second == playerPosition) 
-                  // Only if player is next to enemy with a 5 pixel maring
-                  {    
-                      if(player.x >= enemy.x)
-                         player.respawn(timeOut=50,incrementScore=false);
-                  }
+            for (enemy of allEnemies) {
+                let enemyPosition = enemy.getCurrentTile();
+                if (enemyPosition.first == playerPosition || enemyPosition.second == playerPosition)
+                // Only if player is next to enemy with a 5 pixel margin
+                {
+                    if (player.x - enemy.x <= 5)
+                        player.respawn(timeOut = 50, incrementScore = false);
+                }
             }
         }
     }
@@ -123,9 +119,8 @@ var Engine = (function(global) {
     /* If player reaches water tiles (-1) then task is finished 
       Reset the user position 
     */
-    function taskCompleted()
-    {
-         player.respawn(timeOut=50,incrementScore=true);
+    function taskCompleted() {
+        player.respawn(timeOut = 50, incrementScore = true);
     }
     /* This function initially draws the "game level", it will then call
      * the renderEntities function. Remember, this function is called every
@@ -138,19 +133,17 @@ var Engine = (function(global) {
          * for that particular row of the game level.
          */
         var rowImages = [
-                'images/water-block.png',   // Top row is water
-                'images/stone-block.png',   // Row 1 of 3 of stone
-                'images/stone-block.png',   // Row 2 of 3 of stone
-                'images/stone-block.png',   // Row 3 of 3 of stone
-                'images/grass-block.png',   // Row 1 of 2 of grass
-                'images/grass-block.png'    // Row 2 of 2 of grass
+                'images/water-block.png', // Top row is water
+                'images/stone-block.png', // Row 1 of 3 of stone
+                'images/stone-block.png', // Row 2 of 3 of stone
+                'images/stone-block.png', // Row 3 of 3 of stone
+                'images/grass-block.png', // Row 1 of 2 of grass
+                'images/grass-block.png' // Row 2 of 2 of grass
             ],
-            numRows = 6,
-            numCols = 5,
             row, col;
-        
+
         // Before drawing, clear existing canvas
-        ctx.clearRect(0,0,canvas.width,canvas.height)
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
 
         /* Loop through the number of rows and columns we've defined above
          * and, using the rowImages array, draw the correct image for that
@@ -165,7 +158,7 @@ var Engine = (function(global) {
                  * so that we get the benefits of caching these images, since
                  * we're using them over and over.
                  */
-                ctx.drawImage(Resources.get(rowImages[row]), col * 101, row * 83);
+                ctx.drawImage(Resources.get(rowImages[row]), col * tileWidth, row * tileHeight);
             }
         }
 
@@ -180,7 +173,7 @@ var Engine = (function(global) {
         /* Loop through all of the objects within the allEnemies array and call
          * the render function you have defined.
          */
-        allEnemies.forEach(function(enemy) {
+        allEnemies.forEach(function (enemy) {
             enemy.render();
         });
 

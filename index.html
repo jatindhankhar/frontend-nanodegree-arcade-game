@@ -2,16 +2,35 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Effective JavaScript: Frogger</title>
+    <title> Roaches </title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <p id="tileno"></p>
-    <div id="buginfo">
-        
+
+    <header>
+        <h1>Roaches</h1>
+    </header>
+    <div id="content">
+        <canvas id='cnvs'></canvas>
     </div>
+    <!-- Load constants first-->
+    <script src="js/consts.js"></script>
+    <!-- Then resources -->
     <script src="js/resources.js"></script>
+    <!-- Then Objects -->
     <script src="js/app.js"></script>
+    <!-- Then the engine -->
     <script src="js/engine.js"></script>
+    <footer class="instructions">
+        <span>W</span> 
+        <span>A</span> 
+        <span>S</span> 
+        <span>D</span> or 
+        <span>←</span> 
+        <span>↑</span>
+        <span>→</span>
+        <span>↓</span> 
+        
+    </footer>
 </body>
 </html>
