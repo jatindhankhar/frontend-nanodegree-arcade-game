@@ -22,7 +22,7 @@ var Engine = (function(global) {
         win = global.window,
         canvas = doc.createElement('canvas'),
         ctx = canvas.getContext('2d'),
-        lastTime;
+        lastTime,animationId;
 
     canvas.width = 505;
     canvas.height = 606;
@@ -55,7 +55,7 @@ var Engine = (function(global) {
         /* Use the browser's requestAnimationFrame function to call this
          * function again as soon as the browser is able to draw another frame.
          */
-        win.requestAnimationFrame(main);
+       animationId = win.requestAnimationFrame(main);
     }
 
     /* This function does some initial setup that should only occur once,
@@ -79,7 +79,7 @@ var Engine = (function(global) {
      */
     function update(dt) {
         updateEntities(dt);
-        // checkCollisions();
+        checkCollisions();
     }
 
     /* This is called by the update function and loops through all of the
@@ -96,6 +96,37 @@ var Engine = (function(global) {
         player.update();
     }
 
+    /* Check for collision between enemy and a player 
+    and signal if a player dies */
+    function checkCollisions()
+    {
+        let playerPosition = player.getCurrentTile();
+        if(playerPosition == -1)
+             {
+              taskCompleted();
+            }
+        // If any bug shares same tile as player, player dies
+        else {
+        for(enemy of allEnemies)
+            {
+               let enemyPosition = enemy.getCurrentTile();
+               if(enemyPosition.first ==  playerPosition || enemyPosition.second == playerPosition) 
+                  // Only if player is next to enemy with a 5 pixel maring
+                  {    
+                      if(player.x >= enemy.x)
+                         player.respawn(timeOut=50,incrementScore=false);
+                  }
+            }
+        }
+    }
+
+    /* If player reaches water tiles (-1) then task is finished 
+      Reset the user position 
+    */
+    function taskCompleted()
+    {
+         player.respawn(timeOut=50,incrementScore=true);
+    }
     /* This function initially draws the "game level", it will then call
      * the renderEntities function. Remember, this function is called every
      * game tick (or loop of the game engine) because that's how games work -
